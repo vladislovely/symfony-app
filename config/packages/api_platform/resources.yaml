@@ -1,0 +1,7 @@
+resources:
+  App\Entity\Product: ~
+  App\Entity\Offer:
+    shortName: 'Offer'
+    description: 'An offer from my shop'
+    types: ['https://schema.org/Offer']
+    paginationItemsPerPage: 25
