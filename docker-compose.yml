@@ -13,18 +13,20 @@ x-logging-rules: &logging-rules
 
 volumes:
   php_socket:
+  caddy_data:
+  caddy_config:
   database:
     driver: local
 
 services:
   ### php-fpm ###
-  php-fpm:
-    container_name: php-fpm
+  php:
+    container_name: php
     build:
-      context: deploy/php
+      context: .
       target: app_php
       args:
-        SYMFONY_VERSION: ${SYMFONY_VERSION:-}
+        SYMFONY_VERSION: ${SYMFONY_VERSION:-6.3}
         STABILITY: ${STABILITY:-stable}
       dockerfile: Dockerfile
     #command: 'sh -c "cd /var/www/app && composer install --no-interaction --prefer-dist --optimize-autoloader && php bin/console doctrine:migrations:migrate && php-fpm"'
@@ -37,34 +39,11 @@ services:
       start_period: 30s
     env_file:
       - ${APP_CODE_PATH_HOST}/.env
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-root}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8mb4}
     networks:
       - default
     depends_on:
       database:
         condition: service_healthy
-    ports:
-      - '8080:80'
-    <<: *logging-rules
-
-  ### NGINX Server ###
-  nginx:
-    container_name: nginx
-    image: nginx:1.22.1
-    volumes:
-      - ${APP_CODE_PATH_HOST}/deploy/nginx/conf.d/:/etc/nginx/conf.d/
-      - ${APP_CODE_PATH_HOST}/deploy/nginx_logs:/var/log/nginx/
-      - ${APP_CODE_PATH_HOST}:/var/www/app
-    ports:
-      - "${NGINX_HOST_HTTP_PORT}:80"
-      - "${NGINX_HOST_HTTPS_PORT}:443"
-    restart: unless-stopped
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    depends_on:
-      - php-fpm
-    networks:
-      - default
     <<: *logging-rules
 
   ### Mysql database ###
@@ -90,19 +69,35 @@ services:
       - default
     <<: *logging-rules
 
-  portainer:
-    container_name: portainer
-    image: portainer/portainer-ce:latest
-    ports:
-      - '9443:9443'
-      - '9000:9000'
+  caddy:
+    container_name: caddy
+    build:
+      context: .
+      target: app_caddy
+    depends_on:
+      - php
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost, caddy:80}
+      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-publisherJWTKey123321}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-subscriberJWTKey132456}
     restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./portainer-data:/data
+      - php_socket:/var/run/php
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      # HTTP
+      - target: 80
+        published: ${HTTP_PORT:-80}
+        protocol: tcp
+      # HTTPS
+      - target: 443
+        published: ${HTTPS_PORT:-443}
+        protocol: tcp
+      # HTTP/3
+      - target: 443
+        published: ${HTTP3_PORT:-443}
+        protocol: udp
     networks:
       - default
     <<: *logging-rules

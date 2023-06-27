@@ -1,5 +1,17 @@
 #syntax=docker/dockerfile:1.4
 
+# The different stages of this Dockerfile are meant to be built into separate images
+# https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
+# https://docs.docker.com/compose/compose-file/#target
+
+# Build Caddy with the Mercure and Vulcain modules
+# Temporary fix for https://github.com/dunglas/mercure/issues/770
+FROM caddy:2.7-builder-alpine AS app_caddy_builder
+
+RUN xcaddy build v2.6.4 \
+	--with github.com/dunglas/mercure/caddy \
+	--with github.com/dunglas/vulcain/caddy
+
 # Prod image
 FROM php:8.2-fpm-alpine AS app_php
 
@@ -34,22 +46,23 @@ RUN set -eux; \
 		intl \
 		opcache \
 		zip \
+        pgsql \
+        pdo_pgsql \
     ;
 
-
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-COPY --link conf.d/app.ini $PHP_INI_DIR/conf.d/
-COPY --link conf.d/app.prod.ini $PHP_INI_DIR/conf.d/
+COPY --link docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/
+COPY --link docker/php/conf.d/app.prod.ini $PHP_INI_DIR/conf.d/
 
-COPY --link php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
+COPY --link docker/php/php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 RUN mkdir -p /var/run/php
 
-COPY --link docker-healthcheck.sh /usr/local/bin/docker-healthcheck
+COPY --link docker/php/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
 RUN chmod +x /usr/local/bin/docker-healthcheck
 
 HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 
-COPY --link docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY --link docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 ENTRYPOINT ["docker-entrypoint"]
@@ -70,8 +83,8 @@ RUN set -eux; \
     fi
 
 # copy sources
-COPY --link  ../.. ./
-RUN rm -Rf deploy/
+COPY --link  . ./
+RUN rm -Rf docker/
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
@@ -100,3 +113,12 @@ RUN set -eux; \
     ;
 
 RUN rm -f .env.local.php
+
+# Caddy image
+FROM caddy:2-alpine AS app_caddy
+
+WORKDIR /srv/app
+
+COPY --from=app_caddy_builder --link /usr/bin/caddy /usr/bin/caddy
+COPY --from=app_php --link /srv/app/public public/
+COPY --link docker/caddy/Caddyfile /etc/caddy/Caddyfile
