@@ -1,14 +1,17 @@
 <?php
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ApiResource]
-class Product // The class name will be used to name exposed resources
+class Product
 {
     #[ORM\Id, ORM\Column, ORM\GeneratedValue]
     private ?int $id = null;
@@ -20,7 +23,6 @@ class Product // The class name will be used to name exposed resources
     #[Assert\NotBlank]
     public string $name = '';
 
-    // Notice the "cascade" option below, this is mandatory if you want Doctrine to automatically persist the related entity
     /**
      * @var Offer[]|ArrayCollection
      */
@@ -29,7 +31,7 @@ class Product // The class name will be used to name exposed resources
 
     public function __construct()
     {
-        $this->offers = new ArrayCollection(); // Initialize $offers as a Doctrine collection
+        $this->offers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -37,8 +39,6 @@ class Product // The class name will be used to name exposed resources
         return $this->id;
     }
 
-    // Adding both an adder and a remover as well as updating the reverse relation is mandatory
-    // if you want Doctrine to automatically update and persist (thanks to the "cascade" option) the related entity
     public function addOffer(Offer $offer): void
     {
         $offer->product = $this;

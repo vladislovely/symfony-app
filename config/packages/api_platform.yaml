@@ -1,0 +1,11 @@
+api_platform:
+  title: 'This is my api platform'
+  description: 'This is my description'
+  version: '1.0.0'
+  patch_formats:
+    json: [ 'application/merge-patch+json' ]
+    jsonapi: [ 'application/vnd.api+json' ]
+  mapping:
+    paths:
+      - '%kernel.project_dir%/src/Entity'
+      - '%kernel.project_dir%/config/api_platform'
