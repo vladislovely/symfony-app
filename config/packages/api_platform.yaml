@@ -1,6 +1,6 @@
 api_platform:
-  title: 'This is my api platform'
-  description: 'This is my description'
+  title: 'Api library'
+  description: 'This is my api platform 3 example project, provide manipulations with library'
   version: '1.0.0'
   patch_formats:
     json: [ 'application/merge-patch+json' ]

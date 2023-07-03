@@ -13,12 +13,12 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: HoldRepository::class)]
-#[ApiResource(provider: HoldProvider::class)]
+#[ApiResource(types: ['https://schema.org/Hold'])]
 class Hold
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Assert\Uuid]
     #[ApiProperty(identifier: true)]

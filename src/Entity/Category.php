@@ -15,12 +15,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[ApiResource(provider: CategoryProvider::class)]
+#[ApiResource(types: ['https://schema.org/Category'])]
 class Category
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Assert\Uuid]
     #[ApiProperty(identifier: true)]
@@ -39,7 +39,7 @@ class Category
      * Books collection
      */
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Book::class)]
-    private ArrayCollection $books;
+    private Collection $books;
 
     public function __construct()
     {

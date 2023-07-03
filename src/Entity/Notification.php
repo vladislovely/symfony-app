@@ -13,12 +13,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
-#[ApiResource(provider: NotificationProvider::class)]
+#[ApiResource(types: ['https://schema.org/Notification'])]
 class Notification
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Assert\Uuid]
     #[ApiProperty(identifier: true)]

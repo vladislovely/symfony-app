@@ -15,15 +15,15 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookCopyRepository::class)]
-#[ApiResource(provider: BookCopyProvider::class)]
+#[ApiResource(types: ['https://schema.org/BookCopy'])]
 class BookCopy
 {
     /**
      * @var Uuid|null
      */
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Assert\Uuid]
     #[ApiProperty(identifier: true)]
@@ -54,13 +54,13 @@ class BookCopy
      * Checkout collection
      */
     #[ORM\OneToMany(mappedBy: 'bookCopy', targetEntity: Checkout::class)]
-    private ArrayCollection $checkouts;
+    private Collection $checkouts;
 
     /**
      * Hold collection
      */
     #[ORM\OneToMany(mappedBy: 'bookCopy', targetEntity: Hold::class)]
-    private ArrayCollection $holds;
+    private Collection $holds;
 
     public function __construct()
     {

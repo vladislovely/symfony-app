@@ -14,15 +14,15 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PublisherRepository::class)]
-#[ApiResource(provider: PublisherProvider::class)]
+#[ApiResource(types: ['https://schema.org/Publisher'])]
 class Publisher
 {
     /**
      * @var Uuid|null
      */
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Assert\Uuid]
     #[ApiProperty(identifier: true)]
@@ -37,11 +37,8 @@ class Publisher
     #[Assert\Type('string')]
     public string $title;
 
-    /**
-     * @var ArrayCollection
-     */
     #[ORM\OneToMany(mappedBy: 'publisher', targetEntity: BookCopy::class)]
-    private ArrayCollection $booksCopy;
+    private Collection $booksCopy;
 
     public function __construct()
     {

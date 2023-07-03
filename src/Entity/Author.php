@@ -15,15 +15,15 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
-#[ApiResource(provider: AuthorProvider::class)]
+#[ApiResource(types: ['https://schema.org/Author'])]
 class Author
 {
     /**
      * @var Uuid|null
      */
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Assert\Uuid]
     #[ApiProperty(identifier: true)]
@@ -39,19 +39,10 @@ class Author
     public string $name = '';
 
     /**
-     * Author surname
-     */
-    #[ORM\Column(type: Types::STRING, length: 100, nullable: false)]
-    #[Assert\NotBlank]
-    #[Assert\NotNull]
-    #[Assert\Type('string')]
-    public string $surname = '';
-
-    /**
-     * @var ArrayCollection
+     * @var Collection
      */
     #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'authors')]
-    private ArrayCollection $books;
+    private Collection $books;
 
     public function __construct()
     {

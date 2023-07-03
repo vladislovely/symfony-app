@@ -39,6 +39,13 @@ class AuthorRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByName(array $names): array
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.name IN (:names)')->setParameter('names', $names)
+            ->getQuery()->getResult();
+    }
+
 //    /**
 //     * @return Author[] Returns an array of Author objects
 //     */
