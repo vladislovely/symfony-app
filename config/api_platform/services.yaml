@@ -1,4 +1,0 @@
-services:
-  App\Identifier\UuidUriVariableTransformer:
-    tags:
-      - { name: api_platform.uri_variables.transformer }

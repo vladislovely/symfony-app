@@ -4,19 +4,17 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use App\Repository\CategoryRepository;
-use App\State\CategoryProvider;
-use Doctrine\DBAL\Types\Types;
+use App\Repository\NotificationRepository;
+use App\State\NotificationProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 
-#[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[ApiResource(provider: CategoryProvider::class)]
-class Category
+#[ORM\Entity(repositoryClass: NotificationRepository::class)]
+#[ApiResource(provider: NotificationProvider::class)]
+class Notification
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -26,24 +24,26 @@ class Category
     #[ApiProperty(identifier: true)]
     private ?Uuid $id;
 
-    /**
-     * Category title
-     */
-    #[ORM\Column(type: Types::STRING, length: 100, nullable: false)]
-    #[Assert\NotBlank]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
     #[Assert\NotNull]
+    #[Assert\NotBlank]
+    public \DateTime $sent_at;
+
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: false)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
     #[Assert\Type('string')]
-    public string $title;
+    public string $type;
 
     /**
-     * Books collection
+     * Account
      */
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Book::class)]
-    private ArrayCollection $books;
+    #[ORM\ManyToOne(targetEntity: Account::class, inversedBy: 'notifications')]
+    private Account $account;
 
     public function __construct()
     {
-        $this->books = new ArrayCollection();
+        $this->sent_at = new \DateTime();
     }
 
     /**
@@ -52,13 +52,5 @@ class Category
     public function getId(): ?Uuid
     {
         return $this->id;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getBooks(): Collection
-    {
-        return $this->books;
     }
 }

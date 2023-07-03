@@ -31,8 +31,10 @@ class Publisher
     /**
      * Publisher title
      */
-    #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true, nullable: false)]
     #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Type('string')]
     public string $title;
 
     /**

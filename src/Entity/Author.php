@@ -32,15 +32,19 @@ class Author
     /**
      * Author name
      */
-    #[ORM\Column(type: Types::STRING, length: 100)]
+    #[ORM\Column(type: Types::STRING, length: 100, nullable: false)]
     #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Type('string')]
     public string $name = '';
 
     /**
      * Author surname
      */
-    #[ORM\Column(type: Types::STRING, length: 100)]
+    #[ORM\Column(type: Types::STRING, length: 100, nullable: false)]
     #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Type('string')]
     public string $surname = '';
 
     /**

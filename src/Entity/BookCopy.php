@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use App\Repository\BookCopyRepository;
 use App\State\BookCopyProvider;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -30,8 +32,10 @@ class BookCopy
     /**
      * Published year
      */
-    #[ORM\Column(type: Types::SMALLINT, length: 4)]
+    #[ORM\Column(type: Types::SMALLINT, length: 4, nullable: false)]
     #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Type('int')]
     public int $year_published;
 
     /**
@@ -47,11 +51,45 @@ class BookCopy
     private Publisher $publisher;
 
     /**
+     * Checkout collection
+     */
+    #[ORM\OneToMany(mappedBy: 'bookCopy', targetEntity: Checkout::class)]
+    private ArrayCollection $checkouts;
+
+    /**
+     * Hold collection
+     */
+    #[ORM\OneToMany(mappedBy: 'bookCopy', targetEntity: Hold::class)]
+    private ArrayCollection $holds;
+
+    public function __construct()
+    {
+        $this->checkouts = new ArrayCollection();
+        $this->holds = new ArrayCollection();
+    }
+
+    /**
      * @return Uuid|null
      */
     public function getId(): ?Uuid
     {
         return $this->id;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getHolds(): Collection
+    {
+        return $this->holds;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCheckouts(): Collection
+    {
+        return $this->checkouts;
     }
 
     /**

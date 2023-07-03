@@ -29,8 +29,10 @@ class Book
     /**
      * Book title
      */
-    #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true, nullable: false)]
     #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Type('string')]
     public string $title;
 
     /**
@@ -51,10 +53,17 @@ class Book
     #[ORM\OneToMany(mappedBy: 'book', targetEntity: BookCopy::class)]
     private ArrayCollection $booksCopy;
 
+    /**
+     * Account collection
+     */
+    #[ORM\ManyToMany(targetEntity: Account::class, inversedBy: 'books')]
+    private ArrayCollection $accounts;
+
     public function __construct()
     {
         $this->authors = new ArrayCollection();
         $this->booksCopy = new ArrayCollection();
+        $this->accounts = new ArrayCollection();
     }
 
     /**
@@ -122,6 +131,32 @@ class Book
     {
         if ($this->authors->removeElement($author)) {
             $author->removeBook($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @param Account $account
+     * @return $this
+     */
+    public function addAccount(Account $account): self
+    {
+        if (!$this->accounts->contains($account)) {
+            $this->accounts[] = $account;
+            $account->addBook($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Account $account
+     * @return $this
+     */
+    public function removeAccount(Account $account): self
+    {
+        if ($this->accounts->removeElement($account)) {
+            $account->removeBook($this);
         }
         return $this;
     }
