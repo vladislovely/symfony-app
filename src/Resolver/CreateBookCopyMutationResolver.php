@@ -9,6 +9,7 @@ use App\Entity\Publisher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints\Uuid as UuidConstraint;
 use Symfony\Component\Validator\Validation;
 use Doctrine\Common\Collections\Collection;
@@ -32,26 +33,14 @@ class CreateBookCopyMutationResolver implements MutationResolverInterface
     {
         $data = $context['args']['input'];
 
-        if (empty($data['book_uid'])) {
-            throw new RuntimeException('book_uid can not be empty');
-        }
-
         if (empty($data['publisher_name'])) {
             throw new RuntimeException('publisher_name can not be empty');
         }
 
-        $validator = Validation::createValidator();
+        $isValidBookUid = Uuid::isValid($data['book_uid']);
 
-        $uuidContraint = new UuidConstraint();
-        $uuidContraint->message = 'book_uid does not UUID type';
-
-        $errors = $validator->validate(
-            $data['book_uid'],
-            $uuidContraint
-        );
-
-        if ($errors->count() !== 0) {
-            throw new RuntimeException($errors->get(0)->getMessage());
+        if ($isValidBookUid === false) {
+            throw new RuntimeException('book_uid is not valid or empty, check it and try again');
         }
 
         $findBook = $this->em->getRepository(Book::class)->findOneBy(['id' => $data['book_uid']]);

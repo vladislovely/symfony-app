@@ -168,14 +168,10 @@ class BookCopy
         return $this;
     }
 
-    public function reserve(): bool
+    public function reserve(): self
     {
-        if ($this->count === 0) {
-            return false;
-        }
+        --$this->count;
 
-        $this->count = -1;
-
-        return true;
+        return $this;
     }
 }

@@ -27,7 +27,7 @@ class Notification
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
     #[Assert\NotNull]
     #[Assert\NotBlank]
-    public \DateTime $sent_at;
+    public \DateTimeImmutable $sent_at;
 
     #[ORM\Column(type: Types::STRING, length: 50, nullable: false)]
     #[Assert\NotNull]

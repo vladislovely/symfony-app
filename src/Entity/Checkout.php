@@ -27,11 +27,11 @@ class Checkout
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
     #[Assert\NotNull]
     #[Assert\NotBlank]
-    public \DateTime $start_time;
+    public \DateTimeImmutable $start_time;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     #[Assert\NotBlank]
-    public \DateTime $end_time;
+    public \DateTimeImmutable $end_time;
 
     #[ORM\Column(type: Types::BOOLEAN)]
     #[Assert\NotBlank]

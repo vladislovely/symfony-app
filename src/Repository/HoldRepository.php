@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Hold;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<Hold>
@@ -54,13 +56,18 @@ class HoldRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Hold
-//    {
-//        return $this->createQueryBuilder('h')
-//            ->andWhere('h.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function findHoldByBookCopyIdAndAccountId(string $book_copy_id, string $account_id): ?Hold
+    {
+        return $this->createQueryBuilder('h')
+            ->andWhere('h.bookCopy = :book_copy_id')
+            ->andWhere('h.account = :account_id')
+            ->setParameter('book_copy_id', $book_copy_id)
+            ->setParameter('account_id', $account_id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }
