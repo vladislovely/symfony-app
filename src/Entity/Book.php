@@ -5,6 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use App\Repository\BookRepository;
 use App\Resolver\CreateBookMutationResolver;
 use App\State\BookProvider;
@@ -17,25 +19,29 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
-#[ApiResource(types: ['https://schema.org/Book'], graphQlOperations: [
-    new Mutation(
-        resolver: CreateBookMutationResolver::class,
-        args: [
-            'title' => [
-                'type' => 'String!',
-                'description' => 'Book title'
+#[ApiResource(
+    types: ['https://schema.org/Book'],
+    graphQlOperations: [
+        new Query(),
+        new QueryCollection(paginationType: 'page'),
+        new Mutation(
+            resolver: CreateBookMutationResolver::class,
+            args: [
+                'title' => [
+                    'type' => 'String!',
+                    'description' => 'Book title'
+                ],
+                'category_name' => [
+                    'type' => 'String!',
+                    'description' => 'Book category, for example: Fairy Tale'
+                ],
+                'author_names' => [
+                    'type' => '[String!]',
+                    'description' => 'Array of string author names'
+                ]
             ],
-            'category_name' => [
-                'type' => 'String!',
-                'description' => 'Book category, for example: Fairy Tale'
-            ],
-            'author_names' => [
-                'type' => '[String!]',
-                'description' => 'Array of string author names'
-            ]
-        ],
-        name: 'create'
-    ),
+            name: 'create'
+        ),
 ])]
 class Book
 {

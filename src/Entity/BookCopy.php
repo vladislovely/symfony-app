@@ -4,7 +4,12 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use App\Repository\BookCopyRepository;
+use App\Resolver\CreateBookCopyMutationResolver;
+use App\Resolver\CreateBookMutationResolver;
 use App\State\BookCopyProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,7 +20,35 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookCopyRepository::class)]
-#[ApiResource(types: ['https://schema.org/BookCopy'])]
+#[ApiResource(
+    types: ['https://schema.org/BookCopy'],
+    graphQlOperations: [
+        new Query(),
+        new QueryCollection(paginationType: 'page'),
+        new Mutation(
+            resolver: CreateBookCopyMutationResolver::class,
+            args: [
+                'book_uid' => [
+                    'type' => 'String!',
+                    'description' => 'Original book uid'
+                ],
+                'publisher_name' => [
+                    'type' => 'String!',
+                    'description' => 'Publisher name'
+                ],
+                'year_published' => [
+                    'type' => 'Int!',
+                    'description' => 'Year of publish the book'
+                ],
+                'number_of_copies' => [
+                    'type' => 'Int!',
+                    'description' => 'Number of copies current publisher'
+                ]
+            ],
+            name: 'create'
+        ),
+    ]
+)]
 class BookCopy
 {
     /**
@@ -38,6 +71,11 @@ class BookCopy
     #[Assert\Type('int')]
     public int $year_published;
 
+    #[ORM\Column(type: Types::SMALLINT, length: 4, nullable: false)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Type('int')]
+    public int $count;
     /**
      * Book
      */
@@ -128,5 +166,16 @@ class BookCopy
         $this->publisher = $publisher;
 
         return $this;
+    }
+
+    public function reserve(): bool
+    {
+        if ($this->count === 0) {
+            return false;
+        }
+
+        $this->count = -1;
+
+        return true;
     }
 }
