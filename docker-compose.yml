@@ -15,6 +15,7 @@ volumes:
   php_socket:
   caddy_data:
   caddy_config:
+  redis:
   database:
     driver: local
 
@@ -42,6 +43,8 @@ services:
     networks:
       - default
     depends_on:
+      redis:
+        condition: service_healthy
       database:
         condition: service_healthy
     <<: *logging-rules
@@ -98,6 +101,41 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
+    networks:
+      - default
+    <<: *logging-rules
+
+  redis:
+    container_name: redis
+    image: redis:7.0.5
+    command: redis-server --save 20 1 --loglevel warning
+    restart: unless-stopped
+    env_file:
+      - ${APP_CODE_PATH_HOST}/.env
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      timeout: 10s
+      retries: 5
+    networks:
+      - default
+    <<: *logging-rules
+
+  supervisor:
+    container_name: supervisor
+    image: pimcore/pimcore:php8.2.7-supervisord-v2.0
+    env_file:
+      - ${APP_CODE_PATH_HOST}/.env
+    restart: unless-stopped
+    command: "supervisord -c /etc/supervisord.conf"
+    volumes:
+      - ${APP_CODE_PATH_HOST}:/srv/app
+      - ${APP_CODE_PATH_HOST}/docker/supervisord/supervisord.conf:/etc/supervisord.conf
+    depends_on:
+      - php
     networks:
       - default
     <<: *logging-rules

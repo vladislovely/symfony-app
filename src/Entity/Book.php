@@ -118,6 +118,14 @@ class Book
     }
 
     /**
+     * @return Collection
+     */
+    public function getAccounts(): Collection
+    {
+        return $this->accounts;
+    }
+
+    /**
      * @return Category|null
      */
     public function getCategory(): ?Category

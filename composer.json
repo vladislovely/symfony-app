@@ -20,19 +20,27 @@
         "symfony/expression-language": "6.3.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.3.*",
+        "symfony/mailer": "6.3.*",
+        "symfony/messenger": "6.3.*",
+        "symfony/notifier": "6.3.*",
         "symfony/property-access": "6.3.*",
         "symfony/property-info": "6.3.*",
+        "symfony/redis-messenger": "6.3.*",
         "symfony/runtime": "6.3.*",
         "symfony/security-bundle": "6.3.*",
         "symfony/twig-bundle": "6.3.*",
+        "symfony/uid": "6.3.*",
         "symfony/validator": "6.3.*",
         "symfony/yaml": "6.3.*",
+        "twig/cssinliner-extra": "^3.6",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/inky-extra": "^3.6",
+        "twig/twig": "^2.12|^3.0",
         "webonyx/graphql-php": "^15.5"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
-        "symfony/maker-bundle": "^1.49",
-        "symfony/uid": "6.3.*"
+        "symfony/maker-bundle": "^1.49"
     },
     "config": {
         "allow-plugins": {

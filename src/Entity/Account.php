@@ -62,7 +62,6 @@ class Account
     #[ORM\ManyToMany(targetEntity: Book::class, inversedBy: 'accounts')]
     private Collection $books;
 
-
     /**
      * Checkout collection
      */

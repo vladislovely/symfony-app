@@ -48,7 +48,12 @@ RUN set -eux; \
 		zip \
         pgsql \
         pdo_pgsql \
+        xsl \
+        redis \
+        http \
     ;
+
+RUN chmod +x /usr/local/bin/install-php-extensions && sync
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --link docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/

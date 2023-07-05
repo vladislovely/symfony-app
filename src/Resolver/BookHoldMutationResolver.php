@@ -6,21 +6,23 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use App\Entity\Account;
 use App\Entity\BookCopy;
 use App\Entity\Hold;
+use App\Message\BookHeld;
+use App\Message\BooksAreOver;
 use App\Repository\HoldRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Uuid;
 
 class BookHoldMutationResolver implements MutationResolverInterface
 {
-    private EntityManagerInterface $em;
 
-
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly MessageBusInterface    $bus
+    )
+    {}
 
     /**
      * @param Hold|null $item
@@ -32,6 +34,8 @@ class BookHoldMutationResolver implements MutationResolverInterface
         $data = $context['args']['input'];
 
         $result = $this->validate($data);
+
+        $bookId = null;
 
         $hold = new Hold();
         $hold->setAccount($result['account']);
@@ -46,12 +50,25 @@ class BookHoldMutationResolver implements MutationResolverInterface
 
         if ($result['book_copy'] instanceof BookCopy) {
             $result['book_copy']->reserve();
+
+            $bookId = $result['book_copy']->getBook()?->getId();
         }
 
         $this->em->persist($hold);
         $this->em->flush();
 
+        if ($bookId !== null) {
+            $this->bus->dispatch(new BookHeld($bookId));
+        }
+
+//            if ($result['book_copy'] instanceof BookCopy && $result['book_copy']->count === 0 && $bookId !== null) {
+//                $this->bus->dispatch(new BooksAreOver($bookId));
+//            }
+
         return $hold;
+
+
+        //return null;
     }
 
     private function validate(array $data): array
@@ -123,8 +140,8 @@ class BookHoldMutationResolver implements MutationResolverInterface
                 throw new RuntimeException('end_date can not be less then now');
             }
 
-            if ($endDate > $startDate) {
-                throw new RuntimeException('end_date can not be more then start_date');
+            if ($startDate > $endDate) {
+                throw new RuntimeException('start_date can not be more then end_date');
             }
 
             $result['end_date'] = $endDate;
