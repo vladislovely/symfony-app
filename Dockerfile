@@ -53,8 +53,6 @@ RUN set -eux; \
         http \
     ;
 
-RUN chmod +x /usr/local/bin/install-php-extensions && sync
-
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --link docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/
 COPY --link docker/php/conf.d/app.prod.ini $PHP_INI_DIR/conf.d/
@@ -127,3 +125,12 @@ WORKDIR /srv/app
 COPY --from=app_caddy_builder --link /usr/bin/caddy /usr/bin/caddy
 COPY --from=app_php --link /srv/app/public public/
 COPY --link docker/caddy/Caddyfile /etc/caddy/Caddyfile
+
+# Supervisor image
+FROM pimcore/pimcore:php8.2-supervisord-latest AS supervisor
+
+WORKDIR /srv/app
+
+RUN apt-get update && apt-get install -y autoconf build-essential libpq-dev \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pgsql pdo_pgsql

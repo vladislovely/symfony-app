@@ -126,7 +126,9 @@ services:
 
   supervisor:
     container_name: supervisor
-    image: pimcore/pimcore:php8.2.7-supervisord-v2.0
+    build:
+      context: .
+      target: supervisor
     env_file:
       - ${APP_CODE_PATH_HOST}/.env
     restart: unless-stopped
