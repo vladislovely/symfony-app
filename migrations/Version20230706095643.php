@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230703130608 extends AbstractMigration
+final class Version20230706095643 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -39,12 +39,12 @@ final class Version20230703130608 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_9478D345F675F31B ON book_author (author_id)');
         $this->addSql('COMMENT ON COLUMN book_author.book_id IS \'(DC2Type:uuid)\'');
         $this->addSql('COMMENT ON COLUMN book_author.author_id IS \'(DC2Type:uuid)\'');
-        $this->addSql('CREATE TABLE waitlist (book_id UUID NOT NULL, account_id UUID NOT NULL, PRIMARY KEY(book_id, account_id))');
-        $this->addSql('CREATE INDEX IDX_EE167E3216A2B381 ON waitlist (book_id)');
-        $this->addSql('CREATE INDEX IDX_EE167E329B6B5FBA ON waitlist (account_id)');
-        $this->addSql('COMMENT ON COLUMN waitlist.book_id IS \'(DC2Type:uuid)\'');
-        $this->addSql('COMMENT ON COLUMN waitlist.account_id IS \'(DC2Type:uuid)\'');
-        $this->addSql('CREATE TABLE book_copy (id UUID NOT NULL, book_id UUID DEFAULT NULL, publisher_id UUID DEFAULT NULL, year_published SMALLINT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE book_account (book_id UUID NOT NULL, account_id UUID NOT NULL, PRIMARY KEY(book_id, account_id))');
+        $this->addSql('CREATE INDEX IDX_EE167E3216A2B381 ON book_account (book_id)');
+        $this->addSql('CREATE INDEX IDX_EE167E329B6B5FBA ON book_account (account_id)');
+        $this->addSql('COMMENT ON COLUMN book_account.book_id IS \'(DC2Type:uuid)\'');
+        $this->addSql('COMMENT ON COLUMN book_account.account_id IS \'(DC2Type:uuid)\'');
+        $this->addSql('CREATE TABLE book_copy (id UUID NOT NULL, book_id UUID DEFAULT NULL, publisher_id UUID DEFAULT NULL, year_published SMALLINT NOT NULL, count SMALLINT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_5427F08A16A2B381 ON book_copy (book_id)');
         $this->addSql('CREATE INDEX IDX_5427F08A40C86FCE ON book_copy (publisher_id)');
         $this->addSql('COMMENT ON COLUMN book_copy.id IS \'(DC2Type:uuid)\'');
@@ -81,8 +81,8 @@ final class Version20230703130608 extends AbstractMigration
         $this->addSql('ALTER TABLE book ADD CONSTRAINT FK_CBE5A33112469DE2 FOREIGN KEY (category_id) REFERENCES category (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE book_author ADD CONSTRAINT FK_9478D34516A2B381 FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE book_author ADD CONSTRAINT FK_9478D345F675F31B FOREIGN KEY (author_id) REFERENCES author (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE waitlist ADD CONSTRAINT FK_EE167E3216A2B381 FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE waitlist ADD CONSTRAINT FK_EE167E329B6B5FBA FOREIGN KEY (account_id) REFERENCES account (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE book_account ADD CONSTRAINT FK_EE167E3216A2B381 FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE book_account ADD CONSTRAINT FK_EE167E329B6B5FBA FOREIGN KEY (account_id) REFERENCES account (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE book_copy ADD CONSTRAINT FK_5427F08A16A2B381 FOREIGN KEY (book_id) REFERENCES book (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE book_copy ADD CONSTRAINT FK_5427F08A40C86FCE FOREIGN KEY (publisher_id) REFERENCES publisher (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE checkout ADD CONSTRAINT FK_AF382D4E3B550FE4 FOREIGN KEY (book_copy_id) REFERENCES book_copy (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -101,8 +101,8 @@ final class Version20230703130608 extends AbstractMigration
         $this->addSql('ALTER TABLE book DROP CONSTRAINT FK_CBE5A33112469DE2');
         $this->addSql('ALTER TABLE book_author DROP CONSTRAINT FK_9478D34516A2B381');
         $this->addSql('ALTER TABLE book_author DROP CONSTRAINT FK_9478D345F675F31B');
-        $this->addSql('ALTER TABLE waitlist DROP CONSTRAINT FK_EE167E3216A2B381');
-        $this->addSql('ALTER TABLE waitlist DROP CONSTRAINT FK_EE167E329B6B5FBA');
+        $this->addSql('ALTER TABLE book_account DROP CONSTRAINT FK_EE167E3216A2B381');
+        $this->addSql('ALTER TABLE book_account DROP CONSTRAINT FK_EE167E329B6B5FBA');
         $this->addSql('ALTER TABLE book_copy DROP CONSTRAINT FK_5427F08A16A2B381');
         $this->addSql('ALTER TABLE book_copy DROP CONSTRAINT FK_5427F08A40C86FCE');
         $this->addSql('ALTER TABLE checkout DROP CONSTRAINT FK_AF382D4E3B550FE4');
@@ -115,7 +115,7 @@ final class Version20230703130608 extends AbstractMigration
         $this->addSql('DROP TABLE author');
         $this->addSql('DROP TABLE book');
         $this->addSql('DROP TABLE book_author');
-        $this->addSql('DROP TABLE waitlist');
+        $this->addSql('DROP TABLE book_account');
         $this->addSql('DROP TABLE book_copy');
         $this->addSql('DROP TABLE category');
         $this->addSql('DROP TABLE checkout');

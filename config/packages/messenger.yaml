@@ -13,6 +13,7 @@ framework:
             # Route your messages to the transports
             'App\Message\BookHeld': async
             'App\Message\BooksAreOver': async
+            'App\Message\BookIsAvailable': async
 
 # when@test:
 #    framework:

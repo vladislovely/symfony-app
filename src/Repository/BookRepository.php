@@ -39,20 +39,17 @@ class BookRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Book[] Returns an array of Book objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * @return Book[] Returns an array of Book objects
+     */
+    public function getAccounts(string $book_id): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT account_id FROM book_account b WHERE b.book_id = :book_id';
+
+        return $conn->executeQuery($sql, ['book_id' => $book_id])->fetchAllAssociative();
+    }
 
 //    public function findOneBySomeField($value): ?Book
 //    {

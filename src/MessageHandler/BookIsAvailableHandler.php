@@ -2,8 +2,7 @@
 
 namespace App\MessageHandler;
 
-use App\Entity\Book;
-use App\Message\BookHeld;
+use App\Message\BookIsAvailable;
 use App\Repository\AccountRepository;
 use App\Repository\BookRepository;
 use Psr\Log\LoggerInterface;
@@ -13,7 +12,7 @@ use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
 
 #[AsMessageHandler]
-class BookHeldHandler
+class BookIsAvailableHandler
 {
     public function __construct(
         private readonly BookRepository $bookRepository,
@@ -21,11 +20,11 @@ class BookHeldHandler
         private readonly NotifierInterface $notifier,
         private readonly LoggerInterface $logger,
     ) {}
-    public function __invoke(BookHeld $message): void
+    public function __invoke(BookIsAvailable $message): void
     {
         $bookId = $message->getBookId();
 
-        $this->logger->info('Someone booked the book');
+        $this->logger->info('Someone returned the book, need send notification for people who waiting this book');
         $this->logger->info('Received bookId = {bookId}', ['bookId' => $bookId]);
         $this->logger->info('Trying to find accounts which waiting this book...');
 
@@ -52,7 +51,7 @@ class BookHeldHandler
         $recipients = [];
 
         $notification = (new Notification('Notification, Attention!', ['email']))
-            ->content('Someone already took the book, what are you waiting for, hurry up, or it won’t stay!')
+            ->content('Book from your waitlist, now is available, it is time for order right now!')
             ->importance(Notification::IMPORTANCE_MEDIUM);
 
         foreach ($toAddresses as $address) {

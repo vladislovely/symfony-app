@@ -8,6 +8,8 @@ use App\Entity\BookCopy;
 use App\Entity\Hold;
 use App\Message\BookHeld;
 use App\Message\BooksAreOver;
+use App\Repository\AccountRepository;
+use App\Repository\BookRepository;
 use App\Repository\HoldRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +22,7 @@ class BookHoldMutationResolver implements MutationResolverInterface
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly MessageBusInterface    $bus
+        private readonly MessageBusInterface    $bus,
     )
     {}
 
@@ -61,14 +63,11 @@ class BookHoldMutationResolver implements MutationResolverInterface
             $this->bus->dispatch(new BookHeld($bookId));
         }
 
-//            if ($result['book_copy'] instanceof BookCopy && $result['book_copy']->count === 0 && $bookId !== null) {
-//                $this->bus->dispatch(new BooksAreOver($bookId));
-//            }
+        if ($result['book_copy'] instanceof BookCopy && $result['book_copy']->count === 0 && $bookId !== null) {
+            $this->bus->dispatch(new BooksAreOver($bookId));
+        }
 
         return $hold;
-
-
-        //return null;
     }
 
     private function validate(array $data): array

@@ -10,3 +10,6 @@ portainer-data
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+supervisord.log
+supervisord.pid

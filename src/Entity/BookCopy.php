@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use App\Repository\BookCopyRepository;
 use App\Resolver\CreateBookCopyMutationResolver;
 use App\Resolver\CreateBookMutationResolver;
+use App\Resolver\ReturnBookMutationResolver;
 use App\State\BookCopyProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -46,6 +47,20 @@ use Symfony\Component\Validator\Constraints as Assert;
                 ]
             ],
             name: 'create'
+        ),
+        new Mutation(
+            resolver: ReturnBookMutationResolver::class,
+            args: [
+                'book_copy_uid' => [
+                    'type' => 'String!',
+                    'description' => 'Book copy uid'
+                ],
+                'account_uid' => [
+                    'type' => 'String!',
+                    'description' => 'User account uid'
+                ],
+            ],
+            name: 'return'
         ),
     ]
 )]
@@ -171,6 +186,13 @@ class BookCopy
     public function reserve(): self
     {
         --$this->count;
+
+        return $this;
+    }
+
+    public function return(): self
+    {
+        ++$this->count;
 
         return $this;
     }

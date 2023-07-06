@@ -39,6 +39,19 @@ class AccountRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @return array[] Returns an array of emails objects
+     */
+    public function getEmailsByIds(array $ids): array
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->select('a.email')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Account[] Returns an array of Account objects
 //     */

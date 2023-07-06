@@ -59,7 +59,7 @@ class Account
     /**
      * Books collection
      */
-    #[ORM\ManyToMany(targetEntity: Book::class, inversedBy: 'accounts')]
+    #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'accounts')]
     private Collection $books;
 
     /**
@@ -112,6 +112,14 @@ class Account
     public function getNotifications(): Collection
     {
         return $this->notifications;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getBooks(): Collection
+    {
+        return $this->books;
     }
 
     /**
