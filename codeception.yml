@@ -1,0 +1,26 @@
+namespace: Tests
+support_namespace: Support
+paths:
+    tests: tests
+    output: tests/_output
+    data: tests/Support/Data
+    support: tests/Support
+    envs: tests/_envs
+actor_suffix: Tester
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
+params:
+    - .env.test
+coverage:
+    remote: true
+    enabled: true
+    include:
+        - src/*
+    exclude:
+        - var/cache/*
+    remote_context_options:
+        http:
+            timeout: 60
+        ssl:
+            verify_peer: false

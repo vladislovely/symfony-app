@@ -12,8 +12,8 @@ use App\Repository\BookRepository;
 use App\Repository\HoldRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use http\Client\Response;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -56,7 +56,7 @@ class ReturnBookMutationResolver implements MutationResolverInterface
             $this->bus->dispatch(new BookIsAvailable($originalBookId));
         }
 
-        return null;
+        return new JsonResponse('Book successful returned!');
     }
 
     private function validate(array $data): array

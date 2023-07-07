@@ -5,6 +5,7 @@ portainer-data
 /.env.local
 /.env.local.php
 /.env.*.local
+/.env.test
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -13,3 +14,7 @@ portainer-data
 
 supervisord.log
 supervisord.pid
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###

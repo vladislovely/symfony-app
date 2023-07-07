@@ -6,15 +6,31 @@
 of reusable **PHP components**. Symfony is used by thousands of web
 applications and most of the [popular PHP projects][2].
 
+
+Tech Stack
+------------
+**Server:** Symfony 6 + Redis + PostgreSQL + Codeception + Docker
+
 Installation
 ------------
+Setup env file
 
-* [Install Symfony][4] with Composer (see [requirements details][3]).
-* Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
-  Support" (LTS) versions and has a [release process][6] that is predictable and
-  business-friendly.
-* setup env file
-* docker-compose up -d
+```bash
+  cp .env.example .env
+```
+
+Composer install
+```bash
+  composer install
+```
+Docker build images
+```bash
+  docker compose build --pull --no-cache
+```
+Docker run app
+```bash
+  docker-compose up -d
+```
 
 Documentation
 -------------
