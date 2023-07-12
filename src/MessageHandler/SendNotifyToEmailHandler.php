@@ -7,12 +7,15 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
+
 #[AsMessageHandler]
 class SendNotifyToEmailHandler
 {
     public function __construct(
         private readonly NotifierInterface $notifier,
-    ) {}
+    )
+    {
+    }
 
     public function __invoke(SendNotifyToEmail $message): void
     {

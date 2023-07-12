@@ -53,7 +53,7 @@ class ReturnBookMutationResolver implements MutationResolverInterface
         }
 
         if ($originalBookId !== null) {
-            $this->bus->dispatch(new BookIsAvailable($originalBookId));
+            $this->bus->dispatch(new BookIsAvailable($originalBookId, 'telegram'));
         }
 
         return new JsonResponse('Book successful returned!');

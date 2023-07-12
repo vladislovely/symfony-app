@@ -2,7 +2,6 @@
 
 namespace App\MessageHandler;
 
-use App\Entity\Book;
 use App\Message\BookHeld;
 use App\Message\SendNotifyToEmail;
 use App\Message\SendNotifyToTelegram;
@@ -12,18 +11,21 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\NotifierInterface;
-use Symfony\Component\Notifier\Recipient\Recipient;
 
 #[AsMessageHandler]
 class BookHeldHandler
 {
+    private const CHAT_ID = '712270239';
+
     public function __construct(
-        private readonly BookRepository $bookRepository,
-        private readonly AccountRepository $accountRepository,
-        private readonly LoggerInterface $logger,
-        private readonly MessageBusInterface    $bus
-    ) {}
+        private readonly BookRepository      $bookRepository,
+        private readonly AccountRepository   $accountRepository,
+        private readonly LoggerInterface     $logger,
+        private readonly MessageBusInterface $bus
+    )
+    {
+    }
+
     public function __invoke(BookHeld $message): void
     {
         $bookId = $message->getBookId();
@@ -70,6 +72,6 @@ class BookHeldHandler
     {
         $this->logger->info('Chose transporter telegram');
 
-        $this->bus->dispatch(new SendNotifyToTelegram('Someone already took the book, what are you waiting for, hurry up, or it won’t stay!', '712270239'));
+        $this->bus->dispatch(new SendNotifyToTelegram('Someone already took the book, what are you waiting for, hurry up, or it won’t stay!', self::CHAT_ID));
     }
 }
