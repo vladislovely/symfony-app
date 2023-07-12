@@ -8,6 +8,8 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "api-platform/core": "^3.1",
+        "codeception/module-asserts": "*",
+        "codeception/module-phpbrowser": "*",
         "doctrine/doctrine-bundle": "^2.10",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.15",
@@ -29,6 +31,7 @@
         "symfony/redis-messenger": "6.3.*",
         "symfony/runtime": "6.3.*",
         "symfony/security-bundle": "6.3.*",
+        "symfony/telegram-notifier": "6.3.*",
         "symfony/twig-bundle": "6.3.*",
         "symfony/uid": "6.3.*",
         "symfony/validator": "6.3.*",
@@ -37,9 +40,7 @@
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/inky-extra": "^3.6",
         "twig/twig": "^2.12|^3.0",
-        "webonyx/graphql-php": "^15.5",
-        "codeception/module-phpbrowser": "*",
-        "codeception/module-asserts": "*"
+        "webonyx/graphql-php": "^15.5"
     },
     "require-dev": {
         "codeception/c3": "^2.8",

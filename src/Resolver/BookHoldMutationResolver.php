@@ -60,7 +60,7 @@ class BookHoldMutationResolver implements MutationResolverInterface
         $this->em->flush();
 
         if ($bookId !== null) {
-            $this->bus->dispatch(new BookHeld($bookId));
+            $this->bus->dispatch(new BookHeld($bookId, 'telegram'));
         }
 
         if ($result['book_copy'] instanceof BookCopy && $result['book_copy']->count === 0 && $bookId !== null) {
