@@ -13,6 +13,19 @@ services:
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
+    
+    Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler:
+        arguments:
+            $endpoint: http://host.docker.internal:9200
+            $index: 'monolog'
+            $client: '@es.client'
+            $level: !php/enum Monolog\Level::Debug
+            $bubble: true
+            $elasticsearchVersion: '8.17.1'
+    
+    monolog.formatter.custom_json:
+        class: App\Service\CustomJsonFormatter
+
     App\:
         resource: '../src/'
         exclude:
