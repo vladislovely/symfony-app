@@ -69,13 +69,14 @@ class FgisService extends AbstractFgisComponent
             $requests[] = $value;
         }
 
+        $countRequests = count($requests);
         $counter = 0;
         $pool = new Pool(
             client: $this->client,
             requests: $requests,
             config: [
                 'concurrency' => 2,
-                'fulfilled'   => function (Response $response, $index) use (&$counter, $totalCount) {
+                'fulfilled'   => function (Response $response, $index) use (&$counter, $countRequests) {
                     $decodedResponse = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 
                     $this->bus->dispatch(new UveListProcessing(
@@ -84,7 +85,7 @@ class FgisService extends AbstractFgisComponent
                     ));
 
                     $counter++;
-                    $this->printLog('Завершено на: (' . $counter . ') - ' . round($counter / $totalCount * 100, 1) . '%');
+                    $this->printLog('Завершено на: ' . round($counter / $countRequests * 100, 1) . '%');
                 },
                 'rejected'    => function (RequestException | ConnectException $reason, $index) {
                     echo $reason->getMessage();
