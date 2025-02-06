@@ -1,0 +1,25 @@
+framework:
+    messenger:
+        transports:
+            priority_high:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN_HIGH)%'
+            priority_low:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN_LOW)%'
+            failed:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN_FAILED)%'
+        routing:
+            'App\Message\UveListProcessing': priority_high
+            'App\Message\CreateStandardUnitValue': priority_high
+            'App\Message\ProcessStandardUnitValueGrade': priority_high
+            'App\Message\ProcessStandardUnitValueNpe': priority_high
+            'App\Message\CreateStandardUnitValueGrade': priority_low
+            'App\Message\CreateStandardUnitValueNpe': priority_low
+            'App\Message\LoadExtendedDataByUveId': priority_low
+
+# when@test:
+#    framework:
+#        messenger:
+#            transports:
+#                # replace with your transport name here (e.g., my_transport: 'in-memory://')
+#                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
+#                async: 'in-memory://'

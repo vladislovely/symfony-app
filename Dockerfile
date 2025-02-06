@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	file \
 	gettext \
 	git \
+	supervisor \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
@@ -34,6 +35,7 @@ RUN set -eux; \
 		pdo_pgsql \
 		http \
 		pgsql \
+		redis \
 	;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
@@ -47,11 +49,11 @@ ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 COPY --link docker/frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 docker/frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY --link docker/frankenphp/Caddyfile /etc/caddy/Caddyfile
+COPY --link docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 ENTRYPOINT ["docker-entrypoint"]
 
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
-CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile" ]
 
 # Dev FrankenPHP image
 FROM frankenphp_base AS frankenphp_dev
@@ -67,7 +69,7 @@ RUN set -eux; \
 
 COPY --link docker/frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
-CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod

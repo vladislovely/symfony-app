@@ -25,7 +25,10 @@ services:
     
     monolog.formatter.custom_json:
         class: App\Service\CustomJsonFormatter
-
+        
+    gedmo.listener.timestampable:
+        class: Gedmo\Timestampable\TimestampableListener
+    
     App\:
         resource: '../src/'
         exclude:

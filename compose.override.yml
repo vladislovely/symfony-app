@@ -6,6 +6,8 @@ services:
       target: frankenphp_dev
     volumes:
       - ./:/app
+      - ./var/log:/app/var/log
+      - ./docker/supervisor/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
       - ./docker/frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./docker/frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
       # If you develop on Mac or Windows you can remove the vendor/ directory
@@ -21,6 +23,5 @@ services:
     tty: true
     env_file:
       - .env
-
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###

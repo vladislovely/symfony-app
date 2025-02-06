@@ -31,7 +31,7 @@ services:
   
   database:
     container_name: ${CONTAINER_PREFIX}-database
-    image: postgres:${DB_VERSION:-15}
+    image: postgres:${DB_VERSION:-17}
     restart: unless-stopped
     ports:
       - '${FORWARD_DB_PORT:-5432}:5432'
@@ -49,6 +49,21 @@ services:
       start_period: 10s
     networks:
       - app
+      
+  redis:
+    container_name: ${CONTAINER_PREFIX}-redis
+    image: redis:7.4.2-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 5
+    networks:
+      - app
+    volumes:
+      - redis:/data
     
     # The 'setup' service runs a one-off script which initializes users inside
     # Elasticsearch — such as 'logstash_internal' and 'kibana_system' — with the
@@ -166,6 +181,7 @@ volumes:
   caddy_config:
   database:
   elasticsearch:
+  redis:
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
 
