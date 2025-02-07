@@ -32,8 +32,6 @@ abstract class AbstractFgisComponent
         protected MessageBusInterface $bus
     )
     {
-        ini_set('memory_limit', '2048M');
-
         $stack = HandlerStack::create();
         $stack->push(GuzzleRetryMiddleware::factory([
             'max_retry_attempts' => 5,

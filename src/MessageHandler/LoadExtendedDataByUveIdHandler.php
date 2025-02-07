@@ -7,6 +7,9 @@ use App\Message\LoadExtendedDataByUveId;
 use App\Message\ProcessStandardUnitValueGrade;
 use App\Message\ProcessStandardUnitValueNpe;
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleRetry\GuzzleRetryMiddleware;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Psr\Http\Message\ResponseInterface;
@@ -24,13 +27,22 @@ final class LoadExtendedDataByUveIdHandler
 
     public function __invoke(LoadExtendedDataByUveId $message): void
     {
-        $url = $message->getUri();
+        $stack = HandlerStack::create();
+        $stack->push(GuzzleRetryMiddleware::factory([
+            'max_retry_attempts' => 5,
+            'retry_on_status'    => [429, 502, 500, 504],
+            'retry_on_timeout'   => true,
+            'connect_timeout'    => 10,
+            'timeout'            => 5,
+        ]));
 
-        $client = new \GuzzleHttp\Client();
-        $this->logger->info('i am here');
-        $this->logger->info($url);
-
-        $promise = $client->requestAsync('GET', $url);
+        $client = new Client([
+            'headers'  => [
+                'Accept' => 'application/json',
+            ],
+            'handler'  => $stack,
+        ]);
+        $promise = $client->requestAsync('GET', $message->getUri());
         $promise->then(
             function (ResponseInterface $res) use ($message) {
                 $decodedResponse = json_decode($res->getBody()->getContents(),

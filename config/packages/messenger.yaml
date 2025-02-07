@@ -1,19 +1,31 @@
+parameters:
+    env(CONSUMER_ID): '0'
+
 framework:
     messenger:
         transports:
             priority_high:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN_HIGH)%'
+                options:
+                    consumer: "%env(CONSUMER_ID)%"
+                    delete_after_ack: true
             priority_low:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN_LOW)%'
+                options:
+                    consumer: "%env(CONSUMER_ID)%"
+                    delete_after_ack: true
             failed:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN_FAILED)%'
+                options:
+                    consumer: "%env(CONSUMER_ID)%"
+                    delete_after_ack: true
         routing:
             'App\Message\UveListProcessing': priority_high
             'App\Message\CreateStandardUnitValue': priority_high
             'App\Message\ProcessStandardUnitValueGrade': priority_high
             'App\Message\ProcessStandardUnitValueNpe': priority_high
-            'App\Message\CreateStandardUnitValueGrade': priority_low
-            'App\Message\CreateStandardUnitValueNpe': priority_low
+            'App\Message\CreateStandardUnitValueGrade': priority_high
+            'App\Message\CreateStandardUnitValueNpe': priority_high
             'App\Message\LoadExtendedDataByUveId': priority_low
 
 # when@test:

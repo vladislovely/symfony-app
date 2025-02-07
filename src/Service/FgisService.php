@@ -28,8 +28,6 @@ class FgisService extends AbstractFgisComponent
     protected int $insertErrorsNpeCounter = 0;
     protected int $insertSuccessGradeCounter = 0;
     protected int $insertErrorsGradeCounter = 0;
-    protected array $needAddStandardStatePrimaryIds = [];
-    protected array $needAddGradeStandard = [];
 
     #[NoReturn] public function startFetching(SymfonyStyle $io, ?int $part = null): int
     {
@@ -41,14 +39,11 @@ class FgisService extends AbstractFgisComponent
         $this->printLog('Время начала: ' . $scriptStartTime->format(DateTimeInterface::RFC850));
 
         $highLevelData = [];
-        $pages = range(1, 2);
+        $pages = range(1, 9);
 
         $this->createPaginationRequests($highLevelData, $pages);
 
-        $this->printLog('Время окончания: ' . new \DateTime()->format(DateTimeInterface::RFC850));
-
         $totalCount = array_sum(array_column($highLevelData, 'totalCount'));
-
         $this->printLog('Общее количество элементов - ' . $totalCount);
 
         $client = $this->client;
@@ -118,11 +113,6 @@ class FgisService extends AbstractFgisComponent
 
         $this->printLog('Количество добавленных записей grade:' . $this->insertSuccessGradeCounter);
         $this->printLog('Количество неудачных записей grade:' . $this->insertErrorsGradeCounter);
-
-        $this->printLog('Не хватает записей с npe_id в standard_state_primary:' .
-                        implode(',', array_unique($this->needAddStandardStatePrimaryIds)));
-        $this->printLog('Не хватает записей в grade_standard:' .
-                        implode(',', array_unique($this->needAddGradeStandard)));
     }
 
     private function createPaginationRequests(array &$data, array &$pages): void
