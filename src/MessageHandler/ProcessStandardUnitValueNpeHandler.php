@@ -41,7 +41,6 @@ final class ProcessStandardUnitValueNpeHandler
 
             $standardUnitValueGradeOrderID = $this->getStandardUnitValueGradeOrder($message->getUveId());
             $orderID = $standardUnitValueGradeOrderID ? $standardUnitValueGradeOrderID + 10 : 10;
-            $this->logger->info('i am suvnpe');
 
             $this->bus->dispatch(new CreateStandardUnitValueNpe(
                 standardStatePrimaryId: $primary->getId(),

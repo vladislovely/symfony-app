@@ -8,6 +8,7 @@ use App\Message\ProcessStandardUnitValueGrade;
 use App\Message\ProcessStandardUnitValueNpe;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
 use Psr\Log\LoggerInterface;
@@ -42,44 +43,42 @@ final class LoadExtendedDataByUveIdHandler
             ],
             'handler'  => $stack,
         ]);
-        $promise = $client->requestAsync('GET', $message->getUri());
-        $promise->then(
-            function (ResponseInterface $res) use ($message) {
-                $decodedResponse = json_decode($res->getBody()->getContents(),
-                    true, 512, JSON_THROW_ON_ERROR);
 
-                if (isset($decodedResponse['passport']['interval'])) {
-                    $entity = $this->getStandardUnitValueByUveId($message->getUveId());
-                    $entity?->setInterval((int) $decodedResponse['passport']['interval']);
-                } else {
-                    $this->logger->info($message->getUveId() . ' пустой или нет passport->interval');
-                }
+        try {
+            $uveId = $message->getUveId();
+            $response = $client->request('GET', $message->getUri());
 
-                if (isset($decodedResponse['passport']['rank'])) {
-                    $this->bus->dispatch(new ProcessStandardUnitValueGrade(
-                        rank: $decodedResponse['passport']['rank'],
-                        uveId: $message->getUveId()
-                    ));
-                } else {
-                    $this->logger->info('По uve_id - '. $message->getUveId() . ' не был определен разряд эталона из внутреннего справочника');
-                }
+            $decodedResponse = json_decode($response->getBody()->getContents(),
+                true, 512, JSON_THROW_ON_ERROR);
 
-                if (isset($decodedResponse['general']['npe']) && count($decodedResponse['general']['npe']) > 0) {
-                    $this->bus->dispatch(new ProcessStandardUnitValueNpe(
-                        npes: $decodedResponse['general']['npe'],
-                        uveId: $message->getUveId()
-                    ));
-                } else {
-                    $this->logger->info('По uve_id - '. $message->getUveId() . ' не был определен ГПЭ из внутреннего справочника');
-                }
-            },
-            function (RequestException $e) {
-                echo $e->getMessage() . "\n";
-                echo $e->getRequest()->getMethod();
-            },
-        );
+            if (isset($decodedResponse['passport']['interval'])) {
+                $entity = $this->getStandardUnitValueByUveId($uveId);
+                $entity?->setInterval((int) $decodedResponse['passport']['interval']);
+            } else {
+                $this->logger->info($uveId . ' пустой или нет passport->interval');
+            }
 
-        $promise->wait();
+            if (isset($decodedResponse['passport']['rank'])) {
+                $this->bus->dispatch(new ProcessStandardUnitValueGrade(
+                    rank: $decodedResponse['passport']['rank'],
+                    uveId: $uveId
+                ));
+            } else {
+                $this->logger->info('По uve_id - '. $uveId . ' не был определен разряд эталона из внутреннего справочника');
+            }
+
+            if (isset($decodedResponse['general']['npe']) && count($decodedResponse['general']['npe']) > 0) {
+                $this->bus->dispatch(new ProcessStandardUnitValueNpe(
+                    npes: $decodedResponse['general']['npe'],
+                    uveId: $uveId
+                ));
+            } else {
+                $this->logger->info('По uve_id - '. $uveId . ' не был определен ГПЭ из внутреннего справочника');
+            }
+        } catch (GuzzleException $e) {
+            echo $e->getMessage() . "\n";
+            echo $e->getRequest()->getMethod();
+        }
     }
 
     private function getStandardUnitValueByUveId(int $uveId): ?StandardUnitValue

@@ -36,6 +36,7 @@ RUN set -eux; \
 		http \
 		pgsql \
 		redis \
+		pcntl \
 	;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser

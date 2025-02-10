@@ -79,7 +79,6 @@ abstract class AbstractFgisComponent
     protected function printLog(string $str): void
     {
         $this->logger->info($str);
-        //$this->io->info($str);
 
         echo $str . PHP_EOL;
     }

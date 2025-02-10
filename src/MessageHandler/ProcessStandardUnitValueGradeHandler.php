@@ -39,7 +39,6 @@ final class ProcessStandardUnitValueGradeHandler
             $orderID = $standardUnitValueGradeOrderID ? $standardUnitValueGradeOrderID + 10 : 10;
             $id = $grade->getId() ?? null;
 
-            $this->logger->info('i am suvg');
             $this->bus->dispatch(new CreateStandardUnitValueGrade(
                 standardUnitValueId: $message->getUveId(),
                 gradeStandardId: $id,
